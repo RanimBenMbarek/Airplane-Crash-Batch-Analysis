@@ -20,7 +20,7 @@ public class AccidentCountByYear {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         FileInputFormat.addInputPath(job, new Path("src/main/resources/input/Airplane_Crashes_and_Fatalities.txt"));
-        FileOutputFormat.setOutputPath(job, new Path("src/main/resources/output"));
+        FileOutputFormat.setOutputPath(job, new Path("src/main/resources/output1"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }

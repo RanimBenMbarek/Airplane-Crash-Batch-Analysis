@@ -10,17 +10,20 @@ import java.io.IOException;
 public class AccidentMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     private final static IntWritable one = new IntWritable(1);
-    private Text year = new Text();
+    private Text yearMonth = new Text();
 
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        String[] fields = value.toString().split(","); // Assuming comma-separated values
-
-        // Extract year from the Date field
-        String date = fields[0];
-        String[] dateParts = date.split("/");
-        if (dateParts.length >= 3) {
-            year.set(dateParts[2]);
-            context.write(year, one);
+    public void map(Object key, Text value, Context context
+    ) throws IOException, InterruptedException {
+        String[] fields = value.toString().split(",");
+        if (fields.length >= 1) {
+            String date = fields[0];
+            String[] dateFields = date.split("/");
+            if (dateFields.length >= 2) {
+                String year = dateFields[2];
+                String month = dateFields[0];
+                yearMonth.set(year + "-" + month);
+                context.write(yearMonth, one);
+            }
         }
     }
 }
