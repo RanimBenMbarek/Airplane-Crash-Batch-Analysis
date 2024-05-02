@@ -1,3 +1,5 @@
+package batch;
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -23,7 +25,7 @@ public class FatalitiesByYear {
         public void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
             String line = value.toString();
-            String[] fields = splitCSVLine(line);
+            String[] fields = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
             if (fields.length >= 13) {
                 String date = fields[0];
                 String fatalitiesnumber = fields[10];
@@ -48,28 +50,6 @@ public class FatalitiesByYear {
             }
         }
 
-        private String[] splitCSVLine(String line) {
-            boolean insideQuotes = false;
-            StringBuilder fieldBuilder = new StringBuilder();
-            java.util.List<String> fieldsList = new java.util.ArrayList<>();
-
-            for (char c : line.toCharArray()) {
-                if (c == ',' && !insideQuotes) {
-                    fieldsList.add(fieldBuilder.toString());
-                    fieldBuilder.setLength(0); // Clear the StringBuilder
-                } else {
-                    if (c == '"') {
-                        insideQuotes = !insideQuotes;
-                    }
-                    fieldBuilder.append(c);
-                }
-            }
-
-            fieldsList.add(fieldBuilder.toString());
-
-            return fieldsList.toArray(new String[0]);
-        }
-
     }
 
     public static class SumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
@@ -91,7 +71,9 @@ public class FatalitiesByYear {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+        conf.set("mapreduce.input.fileinputformat.split.maxsize", "67108864"); // 64 MB
         Job job = Job.getInstance(conf, "Fatalities By Year");
+
 
         job.setJarByClass(FatalitiesByYear.class);
         job.setMapperClass(FatalitiesMapper.class);

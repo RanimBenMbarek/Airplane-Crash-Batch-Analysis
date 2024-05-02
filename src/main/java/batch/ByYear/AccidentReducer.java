@@ -1,4 +1,4 @@
-package org.example;
+package batch.ByYear;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;

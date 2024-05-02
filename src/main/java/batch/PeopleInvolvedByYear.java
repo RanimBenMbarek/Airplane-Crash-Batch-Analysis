@@ -1,3 +1,5 @@
+package batch;
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -13,24 +15,30 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-public class AccidentsByFlightType {
+public class PeopleInvolvedByYear {
 
-    public static class FlightTypeMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+    public static class YearMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
-        private final static IntWritable one = new IntWritable(1);
-        private Text flightType = new Text();
+        private final static IntWritable peopleInvolved = new IntWritable();
+        private Text year = new Text();
 
         public void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
-
             String line = value.toString();
+
             String[] fields = splitCSVLine(line);
             if (fields.length >= 13) {
-                String type = fields[6];
-                if (!type.isEmpty()) {
-                    flightType.set(type);
-                    context.write(flightType, one); // Emitting (flight type, 1)
-
+                String date = fields[0];
+                String aboardField = fields[9];
+                if (!date.isEmpty() && !aboardField.isEmpty()) {
+                    String[] dateFields = date.split("/");
+                    if (dateFields.length >= 3) {
+                        String yearValue = dateFields[2];
+                        year.set(yearValue);
+                        int people = Integer.parseInt(aboardField);
+                        peopleInvolved.set(people);
+                        context.write(year, peopleInvolved);
+                    }
                 } else {
                     // Log or skip records with missing or empty fields
                     System.out.println("Skipping record: " + line);
@@ -40,6 +48,7 @@ public class AccidentsByFlightType {
                 System.out.println("Record has insufficient fields: " + line);
             }
         }
+
         private String[] splitCSVLine(String line) {
             boolean insideQuotes = false;
             StringBuilder fieldBuilder = new StringBuilder();
@@ -61,11 +70,12 @@ public class AccidentsByFlightType {
 
             return fieldsList.toArray(new String[0]);
         }
+
     }
 
-
-
     public static class SumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+        private IntWritable result = new IntWritable();
 
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
@@ -73,16 +83,19 @@ public class AccidentsByFlightType {
             for (IntWritable val : values) {
                 sum += val.get();
             }
-            context.write(key, new IntWritable(sum));
+            result.set(sum);
+            context.write(key, result);
+            // Output debug information
+            System.out.println("Reducer Output: Key = " + key.toString() + ", Value = " + sum);
         }
     }
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "accidents by flight type");
+        Job job = Job.getInstance(conf, "people involved by year");
 
-        job.setJarByClass(AccidentsByFlightType.class);
-        job.setMapperClass(FlightTypeMapper.class);
+        job.setJarByClass(PeopleInvolvedByYear.class);
+        job.setMapperClass(YearMapper.class);
         job.setCombinerClass(SumReducer.class);
         job.setReducerClass(SumReducer.class);
 
@@ -93,9 +106,8 @@ public class AccidentsByFlightType {
         job.setOutputFormatClass(TextOutputFormat.class);
 
         FileInputFormat.addInputPath(job, new Path("src/main/resources/input/Airplane_Crashes_and_Fatalities.csv"));
-        FileOutputFormat.setOutputPath(job, new Path("src/main/resources/output3"));
+        FileOutputFormat.setOutputPath(job, new Path("src/main/resources/output4"));
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
-
