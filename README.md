@@ -30,7 +30,7 @@ You can download the dataset from Kaggle:
 
 ## Architecture
 
-![Architecture Diagram](![image](https://github.com/user-attachments/assets/826f51ac-68e3-4fe2-9413-7f016782f38a)
+![](![image](https://github.com/user-attachments/assets/826f51ac-68e3-4fe2-9413-7f016782f38a)
 
 ## Sample Visualizations
 
