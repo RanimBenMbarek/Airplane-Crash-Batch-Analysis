@@ -30,17 +30,17 @@ You can download the dataset from Kaggle:
 
 ## Architecture
 
-![](![image](https://github.com/user-attachments/assets/826f51ac-68e3-4fe2-9413-7f016782f38a)
+![image](https://github.com/user-attachments/assets/826f51ac-68e3-4fe2-9413-7f016782f38a)
 
 ## Sample Visualizations
 
 Here are some sample visualizations produced from the analysis:
 
 1. **Yearly Plane Crashes**:
-   ![Yearly Plane Crashes](![image](https://github.com/user-attachments/assets/17ad3cb1-0402-48d3-8af4-7b3f533ae8c0)
+   ![image](https://github.com/user-attachments/assets/17ad3cb1-0402-48d3-8af4-7b3f533ae8c0)
 
 2. **Fatalities by Aircraft Type**:
-   ![Fatalities by flight Type](![image](https://github.com/user-attachments/assets/9c6ecc21-0088-422e-b14f-7831ed8f5943)
+   ![image](https://github.com/user-attachments/assets/9c6ecc21-0088-422e-b14f-7831ed8f5943)
 
 
 ---
